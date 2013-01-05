@@ -1,17 +1,24 @@
 #include <avr/io.h>
+#include <util/delay.h>
 
-// BCD display mask
-short mask[10] = {
-  0b0111010101,
-  0b0011000000,
-  0b1101000101,
-  0b1111000100,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0
+// BCD display mask for hex digits
+short mask[16] = {
+  0b0111010101, // 0
+  0b0011000000, // 1
+  0b1101000101, // 2
+  0b1111000100, // 3
+  0b1011010000, // 4
+  0b1110010100, // 5
+  0b1110010101, // 6
+  0b0111000000, // 7
+  0b1111010101, // 8
+  0b1111010100, // 9
+  0b1111010001, // A
+  0b1010010101, // B
+  0b0100010101, // C
+  0b1011000101, // D
+  0b1100010101, // E
+  0b1100010001  // F
 };
 
 void delay() {
@@ -50,7 +57,7 @@ void display(int idx) {
   int c = 10;
   while (c--) {
     if (m & 1)
-      delay();
+      _delay_us(100);
     m = m >> 1;
     clockBCD();
   }
@@ -69,10 +76,10 @@ int main(void)
    // Test Frame
    int i = 0;
    while(1) {
+    if (i > 0xf) i = 0;
+    display(i);
+    _delay_ms(500);
     i++;
-    if (i > 9999) i = 0;
-    if (i%1000 == 0) 
-     display(i/1000);
   }
         
   return 0;
