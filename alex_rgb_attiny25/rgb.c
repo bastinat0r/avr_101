@@ -1,17 +1,17 @@
 #include <avr/io.h>
+#include <util/delay.h>
 
-#define WAIT_CYCLES 5000
+#define WAIT_MS 100
 
 int main (void) {
-    int i, t = 0;
+    int t = 0;
 
-    DDRB = 0xFF;
-    PORTB = 0x01;
+    DDRB = (1 << DDB0) | (1 << DDB1) | (1 << DDB2);
+    PORTB = 0;
 
     while ( 1 ) {
-        if ( !(i++ % WAIT_CYCLES) ) {
-            PORTB = (unsigned char) t++ & 0x07;
-        }
+        PORTB = (unsigned char) t++ & 0x07;
+        _delay_ms( WAIT_MS );
     }
 
     return 0;
