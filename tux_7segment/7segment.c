@@ -21,10 +21,6 @@ short mask[16] = {
   0b1100010001  // F
 };
 
-void delay() {
-  int i = 200; while (i--);
-}
-
 /*
  * Triggersignal auf Port B nach maske
  */
