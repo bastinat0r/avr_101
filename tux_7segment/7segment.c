@@ -68,6 +68,7 @@ void display(int idx) {
   int c = 10;
   while (c--) {
     if (m & 1)
+      //TODO timing prüfen
       _delay_us(100);
     m = m >> 1;
     clockBCD();
@@ -118,7 +119,9 @@ int main(void)
   return 0;
 }
 
-// Timer-Code nach http://www.mikrocontroller.net/articles/AVR-GCC-Tutorial/Die_Timer_und_Z%C3%A4hler_des_AVR#8-Bit_Timer.2FCounter
+/*
+ * Timer-Code nach http://www.mikrocontroller.net/articles/AVR-GCC-Tutorial/Die_Timer_und_Z%C3%A4hler_des_AVR#8-Bit_Timer.2FCounter
+ */
 
 /*
  * Der Overflow Interrupt Handler
