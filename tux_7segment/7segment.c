@@ -23,7 +23,7 @@ short mask[16] = {
   0b1111010100, // 9
   0b1111010010, // A
   0b1010010110, // B
-  0b0100010110, // C
+  0b1000000110, // C
   0b1011000110, // D
   0b1100010110, // E
   0b1100010010  // F
@@ -70,19 +70,26 @@ void display(int idx) {
   // und die sync nicht verloren geht
   //  resetBCD();
 
+  const int delay = 1500;
+    
   // maske für idx auslesen
   short m = mask[idx];
   // die bits einzeln durch-shiften
   int c = 10;
+  int d = 0;
   while (c--) {
     // bei gesetztem Bit längere Anzeigedauer
     // -> LED leuchtet
     if (m & 1)
-      _delay_us(2000);
+      _delay_us(delay);
+    else d++;
     // shift und Zähler auslösen
     m = m >> 1;
     clockBCD();
   }
+  
+  while (d--)
+    _delay_us(delay);
 }
 
 void init(void) {
@@ -102,7 +109,7 @@ void init(void) {
    */
   
   // Timer 0 konfigurieren
-  TCCR0 = (1<<CS01)+(1<<CS00); // Prescaler 64
+  TCCR0 = (1<<CS02)+(0<<CS01)+(0<<CS00); // Prescaler 256
  
   // Overflow Interrupt erlauben
   TIMSK |= (1<<TOIE0); 
@@ -152,4 +159,5 @@ ISR (TIMER0_OVF_vect)
 {
   // Neuer Anzeigezyklus für LCD
   display(current_digit);
+  TCNT0 = 265-16;
 }
