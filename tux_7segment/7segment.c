@@ -62,16 +62,24 @@ inline void resetBCD() {
  * Einen Durchlauf Ziffer idx anzeigen
  */
 void display(int idx) {
-
+  // keine Anzeige, wenn idx -1 ist
+  if (idx == -1)
+    return;
+  
   // wird nicht benötigt, wenn zu Beginn resetted wird 
   // und die sync nicht verloren geht
   //  resetBCD();
 
+  // maske für idx auslesen
   short m = mask[idx];
+  // die bits einzeln durch-shiften
   int c = 10;
   while (c--) {
+    // bei gesetztem Bit längere Anzeigedauer
+    // -> LED leuchtet
     if (m & 1)
       _delay_us(2000);
+    // shift und Zähler auslösen
     m = m >> 1;
     clockBCD();
   }
