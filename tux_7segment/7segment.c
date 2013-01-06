@@ -96,10 +96,15 @@ void init(void) {
   /*
    * Pin-Config PortB:
    *   PB0: Clock BCD-Counter (Out)
-   *   PB3: ADC Poti (In)
-   *   PB4: Reset BCD-Counter (Out)
+   *  HEX-Codierer:
+   *   01 an PB1 (In)
+   *   02 an PB3 (In)
+   *   04 an PB2 (In)
+   *   08 an PB4 (In)
    */
-  DDRB = 0b11011111;
+  DDRB  = 0b10000111;
+  // PullUp für Eingänge
+  PORTB = 0b01111000;
    
   // BCD auf Ausgangszustand
   resetBCD();
@@ -115,21 +120,32 @@ void init(void) {
   TIMSK |= (1<<TOIE0); 
   // Global Interrupts aktivieren
   sei();
-  
-  
 }
+
+/*
+ */
+
 int main(void)
 {
   // initialisieren
   init();
 
   // Test Frame
-  int i = 0;
+  //int i = 0;
   while(1) {
-   if (i > 0xF) i = 0;
-   set_current_digit(i);
-   _delay_ms(250);
-   i++;
+//   if (i > 0xF) i = 0;
+//   set_current_digit(i);
+//   _delay_ms(250);
+//   i++;
+    char b = PORTB;
+    int one = (b & (1<<PB1)) == 0;
+    int two = (b & (1<<PB3));
+    int four = (b & (1<<PB2)) == 0;
+    int eight = (b & (1<<PB4)) == 0;
+    
+    //int val = one + two<<1 + four<<2 + eight<<3;
+    set_current_digit(two);
+
   }
         
   return 0;
