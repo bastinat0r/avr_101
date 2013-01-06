@@ -11,26 +11,26 @@
 
 // BCD display mask for hex digits
 short mask[16] = {
-  0b0111010101, // 0
+  0b0111010110, // 0
   0b0011000000, // 1
-  0b1101000101, // 2
+  0b1101000110, // 2
   0b1111000100, // 3
   0b1011010000, // 4
   0b1110010100, // 5
-  0b1110010101, // 6
+  0b1110010110, // 6
   0b0111000000, // 7
-  0b1111010101, // 8
+  0b1111010110, // 8
   0b1111010100, // 9
-  0b1111010001, // A
-  0b1010010101, // B
-  0b0100010101, // C
-  0b1011000101, // D
-  0b1100010101, // E
-  0b1100010001  // F
+  0b1111010010, // A
+  0b1010010110, // B
+  0b0100010110, // C
+  0b1011000110, // D
+  0b1100010110, // E
+  0b1100010010  // F
 };
 
 // globale Variable: die aktuell anzuzeigende Ziffer
-char current_digit = 0;
+volatile char current_digit = 0;
 
 inline void set_current_digit(char _digit) {
   current_digit = _digit;
@@ -68,11 +68,12 @@ void display(int idx) {
   int c = 10;
   while (c--) {
     if (m & 1)
-      //TODO timing prüfen
-      _delay_us(100);
+      _delay_us(2000);
     m = m >> 1;
     clockBCD();
   }
+  
+  resetBCD();
 }
 
 void init(void) {
@@ -110,9 +111,9 @@ int main(void)
   // Test Frame
   int i = 0;
   while(1) {
-   if (i > 0xf) i = 0;
+   if (i > 0xF) i = 0;
    set_current_digit(i);
-   _delay_ms(250);
+   _delay_ms(1);
    i++;
   }
         
