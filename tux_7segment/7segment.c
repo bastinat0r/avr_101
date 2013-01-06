@@ -77,8 +77,9 @@ int main(void)
    int i = 0;
    while(1) {
     if (i > 0xf) i = 0;
-    display(i);
-    _delay_ms(500);
+    int c = 500;
+    while (c--)
+      display(i);
     i++;
   }
         
