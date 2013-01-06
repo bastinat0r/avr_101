@@ -131,20 +131,20 @@ int main(void)
   init();
 
   // Test Frame
-  //int i = 0;
+  int i = 0;
   while(1) {
-//   if (i > 0xF) i = 0;
-//   set_current_digit(i);
-//   _delay_ms(250);
-//   i++;
-    char b = PORTB;
-    int one = (b & (1<<PB1)) == 0;
-    int two = (b & (1<<PB3));
-    int four = (b & (1<<PB2)) == 0;
-    int eight = (b & (1<<PB4)) == 0;
+   if (i > 0xF) i = 0;
+   set_current_digit(i);
+   _delay_ms(250);
+   i++;
+    //char b = PORTB;
+    //int one = (b & (1<<PB1)) == 0;
+    //int two = (b & (1<<PB3));
+    //int four = (b & (1<<PB2)) == 0;
+    //int eight = (b & (1<<PB4)) == 0;
     
     //int val = one + two<<1 + four<<2 + eight<<3;
-    set_current_digit(two);
+    //set_current_digit(two);
 
   }
         
