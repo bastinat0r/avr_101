@@ -62,7 +62,10 @@ inline void resetBCD() {
  * Einen Durchlauf Ziffer idx anzeigen
  */
 void display(int idx) {
-  resetBCD();
+
+  // wird nicht benötigt, wenn zu Beginn resetted wird 
+  // und die sync nicht verloren geht
+  //  resetBCD();
 
   short m = mask[idx];
   int c = 10;
