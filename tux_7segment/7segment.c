@@ -72,8 +72,6 @@ void display(int idx) {
     m = m >> 1;
     clockBCD();
   }
-  
-  resetBCD();
 }
 
 void init(void) {
@@ -93,8 +91,7 @@ void init(void) {
    */
   
   // Timer 0 konfigurieren
-  // TODO richtige Timer-Config
-  TCCR0 = (1<<CS01); // Prescaler 8
+  TCCR0 = (1<<CS01)+(1<<CS00); // Prescaler 64
  
   // Overflow Interrupt erlauben
   TIMSK |= (1<<TOIE0); 
@@ -113,7 +110,7 @@ int main(void)
   while(1) {
    if (i > 0xF) i = 0;
    set_current_digit(i);
-   _delay_ms(1);
+   _delay_ms(250);
    i++;
   }
         
