@@ -70,7 +70,7 @@ void display(int idx) {
   // und die sync nicht verloren geht
   //  resetBCD();
 
-  const int delay = 1500;
+  const int delay = 1000;
     
   // maske für idx auslesen
   short m = mask[idx];
@@ -102,9 +102,9 @@ void init(void) {
    *   04 an PB2 (In)
    *   08 an PB4 (In)
    */
-  DDRB  = 0b10000111;
+  DDRB  = 0b11100001;
   // PullUp für Eingänge
-  PORTB = 0b01111000;
+  PORTB = 0b11111111;
    
   // BCD auf Ausgangszustand
   resetBCD();
@@ -131,20 +131,20 @@ int main(void)
   init();
 
   // Test Frame
-  int i = 0;
+  //int i = 0;
   while(1) {
-   if (i > 0xF) i = 0;
-   set_current_digit(i);
-   _delay_ms(250);
-   i++;
-    //char b = PORTB;
-    //int one = (b & (1<<PB1)) == 0;
-    //int two = (b & (1<<PB3));
-    //int four = (b & (1<<PB2)) == 0;
-    //int eight = (b & (1<<PB4)) == 0;
+   //if (i > 0xF) i = 0;
+   //set_current_digit(i);
+   //_delay_ms(150);
+  // i++;
+   
+   char b = PINB;
+   int val = bit_is_set(b, PB1) ? 0 : 1;
+   val += bit_is_set(b, PB3) ? 0 : 2;
+   val += bit_is_set(b, PB2) ? 0 : 4; 
+   val += bit_is_set(b, PB4) ? 0 : 8;
     
-    //int val = one + two<<1 + four<<2 + eight<<3;
-    //set_current_digit(two);
+   set_current_digit(val);
 
   }
         
@@ -175,5 +175,5 @@ ISR (TIMER0_OVF_vect)
 {
   // Neuer Anzeigezyklus für LCD
   display(current_digit);
-  TCNT0 = 265-16;
+  TCNT0 = 256-4;
 }
