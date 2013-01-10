@@ -22,15 +22,15 @@ short mask[16] = {
   0b1111010110, // 8
   0b1111010100, // 9
   0b1111010010, // A
-  0b1010010110, // B
-  0b1000000110, // C
-  0b1011000110, // D
+  0b1010010110, // b
+  0b1000000110, // c
+  0b1011000110, // d
   0b1100010110, // E
   0b1100010010  // F
 };
 
 // globale Variable: die aktuell anzuzeigende Ziffer
-volatile char current_digit = 0;
+volatile char current_digit = -1;
 
 inline void set_current_digit(char _digit) {
   current_digit = _digit;
@@ -96,14 +96,17 @@ void init(void) {
   /*
    * Pin-Config PortB:
    *   PB0: Clock BCD-Counter (Out)
-   *  HEX-Codierer:
-   *   01 an PB1 (In)
-   *   02 an PB3 (In)
-   *   04 an PB2 (In)
-   *   08 an PB4 (In)
+   *   PB1: HEX-Codierer 01 (In)
+   *   PB3: HEX-Codierer 02 (In)
+   *   PB2: HEX-Codierer 04 (In)
+   *   PB4: HEX-Codierer 08 (In)
    */
   DDRB  = 0b11100001;
   // PullUp für Eingänge
+  /*
+   * Aus bisher nicht geklärten Gründen ist der PullUp an PB4 nicht wirksam und
+   * musste in der Schaltung ergänzt werden!
+   */
   PORTB = 0b11111111;
    
   // BCD auf Ausgangszustand
@@ -118,6 +121,7 @@ void init(void) {
  
   // Overflow Interrupt erlauben
   TIMSK |= (1<<TOIE0); 
+  
   // Global Interrupts aktivieren
   sei();
 }
@@ -130,22 +134,22 @@ int main(void)
   // initialisieren
   init();
 
-  // Test Frame
-  //int i = 0;
   while(1) {
-   //if (i > 0xF) i = 0;
-   //set_current_digit(i);
-   //_delay_ms(150);
-  // i++;
-   
+   // Pin-Belegung Port B auslesen
    char b = PINB;
+   // 4 Pins in Hex-Ziffer umwandeln
+   /*
+    * Bei günstigerer PIN-Belegung lässt sich das auch als
+    * int val = (b>>1)&0xF;
+    * darstellen!
+    */
    int val = bit_is_set(b, PB1) ? 0 : 1;
    val += bit_is_set(b, PB3) ? 0 : 2;
    val += bit_is_set(b, PB2) ? 0 : 4; 
    val += bit_is_set(b, PB4) ? 0 : 8;
     
+   // val als angezeigte Ziffer einstellen
    set_current_digit(val);
-
   }
         
   return 0;
@@ -166,14 +170,14 @@ int main(void)
 #define TIMER0_OVF_vect TIMER0_OVF0_vect
 #endif
  
-/* Interrupt Aktion alle
- * (1000000/8)/256 Hz = 488,28125 Hz
- * bzw.
- * 1/488,28125 s = 2,048 ms  
+/* 
+ * Interrupt-Aktion bei Timer-Überlauf
  */
 ISR (TIMER0_OVF_vect)
 {
   // Neuer Anzeigezyklus für LCD
   display(current_digit);
+  
+  // Counter hochsetzen, wir wollen keinen ganzen Zyklus warten
   TCNT0 = 256-4;
 }
