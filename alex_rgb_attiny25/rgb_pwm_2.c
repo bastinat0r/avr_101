@@ -1,9 +1,12 @@
+#include <stdbool.h>
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
 /*  defines */
-#define PORT_MASK   0x07;
+#define PORT_MASK       0x07
+#define INVERTED_LED    true
 
 /*  constants   */
 const unsigned char pwmtable[32] = {
@@ -19,7 +22,8 @@ void init( void );
 
 /*  ISR     */
 ISR(TIMER0_OVF_vect) {
-    static unsigned char    pin_level = PORT_MASK;
+    static unsigned char    pin_level = ( INVERTED_LED ? 0 : PORT_MASK );
+    static unsigned char    led_status = 0;
     static unsigned char    comp_R, comp_G, comp_B;
     static unsigned char    soft_cnt_R = 0xFF;
     static unsigned char    soft_cnt_G = 0xFF - 85;
@@ -30,31 +34,33 @@ ISR(TIMER0_OVF_vect) {
     PORTB = pin_level;
 
     /*  increment counter and if overflow update compare value from
-     *  main loop buffer    */
+     *  main loop buffer and set LED on */
     if ( ++soft_cnt_R == 0 ) {
         comp_R = comp_buf_R;
-        pin_level |= 0x01;
+        led_status |= 0x01;
     }
     if ( ++soft_cnt_G == 0 ) {
         comp_G = comp_buf_G;
-        pin_level |= 0x02;
+        led_status |= 0x02;
     }
     if ( ++soft_cnt_B == 0 ) {
         comp_B = comp_buf_B;
-        pin_level |= 0x04;
+        led_status |= 0x04;
     }
 
-    /*  on compare match clear pin level (written to port on next
-     *  interrupt   */
+    /*  on compare match set LED off (written to port on next
+     *  interrupt)  */
     if ( comp_R == soft_cnt_R ) {
-        pin_level &= ~0x01;
+        led_status &= ~0x01;
     }
     if ( comp_G == soft_cnt_G ) {
-        pin_level &= ~0x02;
+        led_status &= ~0x02;
     }
     if ( comp_B == soft_cnt_B ) {
-        pin_level &= ~0x04;
+        led_status &= ~0x04;
     }
+
+    pin_level = ( INVERTED_LED ? ~led_status : led_status ) & PORT_MASK;
 }
 
 /*  main    */
