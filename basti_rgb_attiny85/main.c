@@ -1,12 +1,14 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
+
+
+#define F_CPU					8000000UL
 #include <util/delay.h>
 
 #define fucking				unsigned
 #define PORT_MASK 		0x07
 #define MAX_INTERVAL	64
-#define WAIT_MS				50
-#define F_CPU					8000000UL
+#define WAIT_MS				3
 
 /* globals */
 volatile fucking char comp_R, comp_G, comp_B;
@@ -76,38 +78,80 @@ void set_RGB( fucking char r, fucking char g, fucking char b )
 	comp_B = pwmtable[ b >> 3 ];
 }
 
-int main( void ) 
-{	
+volatile fucking char x = 37;
+volatile fucking char a = 3;
+volatile fucking char c = 137;
+volatile fucking char m = 255;
+
+fucking char random() {
+	
+	x = ((x * a) + c) % m;
+	return x;
+
+}
+
+void demoLoop( char rand ) {
+
 	fucking char r = 0;
 	fucking char g = 0;
 	fucking char b = 0;
 
+	fucking char nr = 0;
+	fucking char ng = 0;
+	fucking char nb = 0;
+	
+	fucking char i;
+
 	signed char dr = 1;
 	signed char dg = 2;
 	signed char db = 3;
-	
+  char num = 16;
+	while(num > 0) {
+		num--;	
+		if(rand > 0) {
+			nr = random();
+			ng = random();
+			nb = random();
+		} else {
+			if((num & 8) > 0) {
+				nr = 255;
+			} else {
+				nr = 0;
+			}
+			if((num & 4) > 0) {
+				ng = 255;
+			} else {
+				ng = 0;
+			}
+			if((num & 2) > 0) {
+				nb = 255;
+			} else {
+				nb = 0;
+			}
+			if((num & 1) == 0) {
+				nr = 0;
+				ng = 0;
+				nb = 0;
+			}
+		}
+
+		i = 0;
+		while(i++ < 255) {
+			_delay_ms(WAIT_MS);
+			set_RGB((r + (nr - r) * i / 255) , (g + (ng - g) * i / 255), (b + (nb - b) * i / 255));
+		}
+		r = nr;
+		g = ng;
+		b = nb;
+		//set_RGB(0, 62, 0);
+	}
+}
+
+int main( void ) 
+{	
 	init();
 	while(1) {
-		r += dr;
-		if(r > 250)
-			dr = -1;
-		if(r < 5)
-			dr = 1;
-
-		g += dg;
-		if(g > 250)
-			dg = -2;
-		if(g < 5)
-			dg = 3;
-
-		b += db;
-		if(b > 250)
-			db = -1;
-		if(b < 5)
-			db = 2;
-
-		_delay_ms(WAIT_MS);
-		set_RGB(r, g, b);
-		//set_RGB(0, 62, 0);
+		demoLoop(0);
+		demoLoop(1);
 	}
 }
